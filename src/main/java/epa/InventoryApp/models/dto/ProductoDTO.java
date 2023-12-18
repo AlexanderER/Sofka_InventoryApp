@@ -1,15 +1,12 @@
-package epa.InventoryApp.models;
+package epa.InventoryApp.models.dto;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
 
-@Document("Producto")
-public class Producto
+public class ProductoDTO
 {
     //--------------------------------------------------- (Variables)
-    @Id
     private String id;
     private String descripcion;
     private Integer existencia;
@@ -20,11 +17,11 @@ public class Producto
 
 
     //--------------------------------------------------- (Constructores)
-    public Producto()
+    public ProductoDTO()
     {
     }
 
-    public Producto(String id, String descripcion, Integer existencia, BigDecimal costo, BigDecimal precioUnitarioAlDetalle, BigDecimal precioUnitarioAlPorMayor, Integer unidadesMinimaAlPorMayor)
+    public ProductoDTO(String id, String descripcion, Integer existencia, BigDecimal costo, BigDecimal precioUnitarioAlDetalle, BigDecimal precioUnitarioAlPorMayor, Integer unidadesMinimaAlPorMayor)
     {
         this.id = id;
         this.descripcion = descripcion;
@@ -37,6 +34,8 @@ public class Producto
 
 
     //--------------------------------------------------- (Getter y Setter)
+
+
     public String getId() {
         return id;
     }
