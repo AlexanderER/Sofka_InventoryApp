@@ -6,6 +6,7 @@ import epa.InventoryApp.models.dto.VentaInventarioDTO;
 import epa.InventoryApp.usecase.movimientosInventario.AgregarInventarioPorLoteUseCase;
 import epa.InventoryApp.usecase.movimientosInventario.AgregarInventarioPorUnidadUseCase;
 import epa.InventoryApp.usecase.movimientosInventario.VentaAlDetalleUseCase;
+import epa.InventoryApp.usecase.movimientosInventario.VentaAlPorMayorUseCase;
 import epa.InventoryApp.usecase.producto.CrearProductoUseCase;
 import epa.InventoryApp.usecase.producto.ListarProductosPaginadoUseCaseImp;
 import org.springframework.context.annotation.Bean;
@@ -91,12 +92,27 @@ public class ProductoRouter
 
 
     @Bean
-    public RouterFunction<ServerResponse> ventaAlDetalleRoute(VentaAlDetalleUseCase ventaAlDetalleUseCase) {
+    public RouterFunction<ServerResponse> ventaAlDetalleRoute(VentaAlDetalleUseCase useCase) {
         return route(POST("/productos/ventadetalle")
                         .and(accept(MediaType.APPLICATION_JSON)),
                 request -> request.bodyToFlux(VentaInventarioDTO.class)
                         .collectList()
-                        .flatMapMany(ventaAlDetalleUseCase::apply)
+                        .flatMapMany(useCase::apply)
+                        .collectList()
+                        .flatMap(result -> ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(result))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
+        );
+    }
+
+    @Bean
+    public RouterFunction<ServerResponse> ventaAlPorMayorRoute(VentaAlPorMayorUseCase useCase) {
+        return route(POST("/productos/ventapormayor")
+                        .and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToFlux(VentaInventarioDTO.class)
+                        .collectList()
+                        .flatMapMany(useCase::apply)
                         .collectList()
                         .flatMap(result -> ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
