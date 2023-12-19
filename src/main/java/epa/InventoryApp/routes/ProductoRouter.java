@@ -2,8 +2,10 @@ package epa.InventoryApp.routes;
 
 import epa.InventoryApp.models.dto.AgregarInventarioDTO;
 import epa.InventoryApp.models.dto.ProductoDTO;
+import epa.InventoryApp.models.dto.VentaInventarioDTO;
 import epa.InventoryApp.usecase.movimientosInventario.AgregarInventarioPorLoteUseCase;
 import epa.InventoryApp.usecase.movimientosInventario.AgregarInventarioPorUnidadUseCase;
+import epa.InventoryApp.usecase.movimientosInventario.VentaAlDetalleUseCase;
 import epa.InventoryApp.usecase.producto.CrearProductoUseCase;
 import epa.InventoryApp.usecase.producto.ListarProductosPaginadoUseCaseImp;
 import org.springframework.context.annotation.Bean;
@@ -13,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 
 import java.math.BigDecimal;
 
@@ -34,7 +37,7 @@ public class ProductoRouter
                                 .flatMap(result -> ServerResponse.ok()
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(result))
-                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build())
+                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
                     );
     }
 
@@ -49,7 +52,7 @@ public class ProductoRouter
                                     return ServerResponse.ok()
                                             .contentType(MediaType.APPLICATION_JSON)
                                             .body(BodyInserters.fromPublisher(useCase.apply(pagina, tamanoPagina), ProductoDTO.class))
-                                            .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
+                                            .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()));
                                 }
                     );
     }
@@ -65,7 +68,7 @@ public class ProductoRouter
                         .flatMap(result -> ServerResponse.ok()
                                                          .contentType(MediaType.APPLICATION_JSON)
                                                          .bodyValue(result))
-                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build())
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
         );
     }
 
@@ -82,9 +85,26 @@ public class ProductoRouter
                         .flatMap(result -> ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(result))
-                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build())
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
         );
     }
+
+
+    @Bean
+    public RouterFunction<ServerResponse> ventaAlDetalleRoute(VentaAlDetalleUseCase ventaAlDetalleUseCase) {
+        return route(POST("/productos/ventadetalle")
+                        .and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToFlux(VentaInventarioDTO.class)
+                        .collectList()
+                        .flatMapMany(ventaAlDetalleUseCase::apply)
+                        .collectList()
+                        .flatMap(result -> ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(result))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
+        );
+    }
+
 
 
 
