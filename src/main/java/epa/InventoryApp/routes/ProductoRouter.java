@@ -1,6 +1,8 @@
 package epa.InventoryApp.routes;
 
+import epa.InventoryApp.models.dto.AgregarInventarioDTO;
 import epa.InventoryApp.models.dto.ProductoDTO;
+import epa.InventoryApp.usecase.movimientosInventario.AgregarInventarioPorUnidadUseCase;
 import epa.InventoryApp.usecase.producto.CrearProductoUseCase;
 import epa.InventoryApp.usecase.producto.ListarProductosPaginadoUseCaseImp;
 import org.springframework.context.annotation.Bean;
@@ -51,5 +53,19 @@ public class ProductoRouter
                     );
     }
 
+
+    @Bean
+    public RouterFunction<ServerResponse> AgregarInventarioPorUnidadRoute(AgregarInventarioPorUnidadUseCase useCase)
+    {
+        return route(POST("/productos/agregarporunidad")
+                        .and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToMono(AgregarInventarioDTO.class)
+                        .flatMap(useCase::apply)
+                        .flatMap(result -> ServerResponse.ok()
+                                                         .contentType(MediaType.APPLICATION_JSON)
+                                                         .bodyValue(result))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build())
+        );
+    }
 
 }
