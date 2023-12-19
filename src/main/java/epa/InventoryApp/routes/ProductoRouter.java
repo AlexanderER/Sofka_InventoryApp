@@ -2,6 +2,7 @@ package epa.InventoryApp.routes;
 
 import epa.InventoryApp.models.dto.AgregarInventarioDTO;
 import epa.InventoryApp.models.dto.ProductoDTO;
+import epa.InventoryApp.usecase.movimientosInventario.AgregarInventarioPorLoteUseCase;
 import epa.InventoryApp.usecase.movimientosInventario.AgregarInventarioPorUnidadUseCase;
 import epa.InventoryApp.usecase.producto.CrearProductoUseCase;
 import epa.InventoryApp.usecase.producto.ListarProductosPaginadoUseCaseImp;
@@ -67,5 +68,25 @@ public class ProductoRouter
                         .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build())
         );
     }
+
+
+    @Bean
+    public RouterFunction<ServerResponse> AgregarInventarioPorLoteRoute(AgregarInventarioPorLoteUseCase useCase)
+    {
+        return route(POST("/productos/agregarporlote")
+                        .and(accept(MediaType.APPLICATION_JSON)),
+                request -> request.bodyToFlux(AgregarInventarioDTO.class)
+                        .collectList()
+                        .flatMapMany(useCase::apply)
+                        .collectList()
+                        .flatMap(result -> ServerResponse.ok()
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .bodyValue(result))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).build())
+        );
+    }
+
+
+
 
 }
