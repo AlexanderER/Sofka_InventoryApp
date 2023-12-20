@@ -6,4 +6,5 @@ data:
   appPort: "8083"
   mongoUri: "mongodb://mongo-service:27017"
   mongoDatabase: "dbInventory"
-  rabbitUri: "amqps://dzvtwtas:CIc5hiR1KTAW8IfQSRpSa8MDt5-xHSqg@woodpecker.rmq.cloudamqp.com/dzvtwtas"
+  rabbitUri: "amqp://rabbit-service:5672"
+  #rabbitUri: "amqps://dzvtwtas:CIc5hiR1KTAW8IfQSRpSa8MDt5-xHSqg@woodpecker.rmq.cloudamqp.com/dzvtwtas"
