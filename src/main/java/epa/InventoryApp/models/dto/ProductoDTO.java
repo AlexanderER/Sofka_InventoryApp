@@ -3,6 +3,7 @@ package epa.InventoryApp.models.dto;
 import org.springframework.data.annotation.Id;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 public class ProductoDTO
 {
@@ -90,5 +91,20 @@ public class ProductoDTO
 
     public void setUnidadesMinimaAlPorMayor(Integer unidadesMinimaAlPorMayor) {
         this.unidadesMinimaAlPorMayor = unidadesMinimaAlPorMayor;
+    }
+
+    //--------------------------------------------------- (Equals y HashCode)
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        ProductoDTO that = (ProductoDTO) object;
+        return Objects.equals(id, that.id) && Objects.equals(descripcion, that.descripcion) && Objects.equals(existencia, that.existencia) && Objects.equals(costo, that.costo) && Objects.equals(precioUnitarioAlDetalle, that.precioUnitarioAlDetalle) && Objects.equals(precioUnitarioAlPorMayor, that.precioUnitarioAlPorMayor) && Objects.equals(unidadesMinimaAlPorMayor, that.unidadesMinimaAlPorMayor);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, descripcion, existencia, costo, precioUnitarioAlDetalle, precioUnitarioAlPorMayor, unidadesMinimaAlPorMayor);
     }
 }
