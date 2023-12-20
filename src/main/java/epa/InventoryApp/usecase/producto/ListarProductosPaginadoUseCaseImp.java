@@ -22,11 +22,11 @@ public class ListarProductosPaginadoUseCaseImp implements ListarProductosPaginad
 
     //------------------------------------------------------------------------- (Implementación Uso de Caso)
     @Override
-    public Flux<ProductoDTO> apply(int pagina, int tamanoPagina)
+    public Flux<ProductoDTO> apply(int pagina, int cantPorPagina)
     {
         return repositorio.findAll()
-                .skip((pagina - 1) * tamanoPagina)
-                .take(tamanoPagina)
+                .skip((pagina - 1) * cantPorPagina)
+                .take(cantPorPagina)
                 .map(this::getProductoDTO);
     }
 
