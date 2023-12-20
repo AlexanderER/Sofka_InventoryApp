@@ -30,7 +30,7 @@ public class OpenApiConfig
                 .title("Documentación API´s Reto EPA")
                 .version("1.0")
                 .contact(contact)
-                .description("Los metodos expuestos que brindan funcionalidad para el Modulo de Ventas y su Reporteria.");
+                .description("Los metodos expuestos brindan la funcionalidad para el Modulo de Inventario.");
 
         return new OpenAPI().info(info).servers(List.of(devServer));
     }
