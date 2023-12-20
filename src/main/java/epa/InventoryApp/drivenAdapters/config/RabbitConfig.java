@@ -27,14 +27,17 @@ public class RabbitConfig
     //------------------------------------------------------------------------------------ (Variables)
     // EXCHANGES
     public static final String EXCHANGE_NAME_MOVEMENTS = "movements-exchange";
+    public static final String EXCHANGE_NAME_ERRORS = "errors-exchange";
 
 
     // ROUTING KEY
     public static final String ROUTING_KEY_NAME_MOVEMENTS = "movements.routing.key";
+    public static final String ROUTING_KEY_NAME_ERRORS = "errors.routing.key";
 
 
     // QUEUES
     public static final String QUEUE_NAME_MOVEMENTS = "movements-queue";
+    public static final String QUEUE_NAME_ERRORS = "errors-queue";
 
 
     // URL
@@ -52,18 +55,23 @@ public class RabbitConfig
 
         // Defino los exchange
         var exchangeMovements = new TopicExchange(EXCHANGE_NAME_MOVEMENTS);
+        var exchangeErrors    = new TopicExchange(EXCHANGE_NAME_ERRORS);
 
 
         // Defino las Colas
         var queueMovements = new Queue(QUEUE_NAME_MOVEMENTS, true, false, false);
+        var queueErrors    = new Queue(QUEUE_NAME_ERRORS, true, false, false);
 
 
         // Inicializo en la conexion
         amqpAdmin.declareExchange(exchangeMovements);
+        amqpAdmin.declareExchange(exchangeErrors);
 
         amqpAdmin.declareQueue(queueMovements);
+        amqpAdmin.declareQueue(queueErrors);
 
         amqpAdmin.declareBinding(BindingBuilder.bind(queueMovements).to(exchangeMovements).with(ROUTING_KEY_NAME_MOVEMENTS));
+        amqpAdmin.declareBinding(BindingBuilder.bind(queueErrors).to(exchangeErrors).with(ROUTING_KEY_NAME_ERRORS));
 
         return amqpAdmin;
     }

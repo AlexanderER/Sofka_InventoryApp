@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 
 @Service
@@ -51,10 +52,16 @@ public class AgregarInventarioPorUnidadUseCase implements Function<AgregarInvent
                                                                                                            .build();
                                                     eventBus.publishMovement(movimiento);
                                                 })
-                                                .doOnError(error -> Mono.error(new RuntimeException("[Producto] Error al Agregar Inventario por Unidad.", error)))
+                                                .doOnError(error -> {
+                                                                        eventBus.publishError("[AgregarInventarioPorUnidadUseCase] [" + LocalDateTime.now().toString() + "] Error al agregar inventario. Id Producto: " + idProducto + " Cant: " + cantidad);
+                                                                        Mono.error(new RuntimeException("[Producto] Error al Agregar Inventario por Unidad.", error));
+                                                                    })
                                                 .map(this::getProductoDTO);
                                      })
-                .switchIfEmpty(Mono.error(new RuntimeException("[Producto] Error producto no encontrado.")));
+                .switchIfEmpty(Mono.defer(() -> {  // Para asegurarse de que eventBus.publishError("") se ejecute solo cuando switchIfEmpty se activa
+                                                    eventBus.publishError("[AgregarInventarioPorUnidadUseCase] [" + LocalDateTime.now().toString() + "] Producto no encontrado. Id: " + idProducto);
+                                                    return Mono.error(new RuntimeException("[Producto] Error producto no encontrado."));
+                                                }));
     }
 
     //------------------------------------------------------------------------- (Casteo)

@@ -10,6 +10,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 
@@ -43,6 +44,7 @@ public class VentaAlDetalleUseCase implements Function<List<VentaInventarioDTO>,
                     }
                     else
                     {
+                        eventBus.publishError("[VentaAlDetalleUseCase] [" + LocalDateTime.now().toString() + "] Al menos un elemento no aplica para venta al Detalle.");
                         return Flux.error(new RuntimeException("[Producto] Error al menos un elemento no aplica para venta al Detalle."));
                     }
                 });
@@ -84,10 +86,16 @@ public class VentaAlDetalleUseCase implements Function<List<VentaInventarioDTO>,
 
                                     eventBus.publishMovement(movimiento);
                             })
-                            .doOnError(error -> Mono.error(new RuntimeException("[Producto] Error al Procesar Venta al Detalle.", error)))
+                            .doOnError(error -> {
+                                                    eventBus.publishError("[VentaAlDetalleUseCase] [" + LocalDateTime.now().toString() + "] Error al Procesar Venta al Detalle. Id Producto: " + idProducto + " Cant: " + cantidadVenta);
+                                                    Mono.error(new RuntimeException("[Producto] Error al registrar venta al Detalle.", error));
+                                                })
                             .map(this::getProductoDTO);
                 })
-                .switchIfEmpty(Mono.error(new RuntimeException("Producto no encontrado con ID: " + idProducto)));
+                .switchIfEmpty(Mono.defer(() -> {  // Para asegurarse de que eventBus.publishError("") se ejecute solo cuando switchIfEmpty se activa
+                                                    eventBus.publishError("[VentaAlDetalleUseCase] [" + LocalDateTime.now().toString() + "] Producto no encontrado. Id: " + idProducto);
+                                                    return Mono.error(new RuntimeException("Producto no encontrado con ID: " + idProducto));
+                                                }));
     }
 
 

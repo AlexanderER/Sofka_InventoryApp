@@ -38,7 +38,7 @@ public class ProductoRouter
                                 .flatMap(result -> ServerResponse.ok()
                                         .contentType(MediaType.APPLICATION_JSON)
                                         .bodyValue(result))
-                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
+                                .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue(throwable.getMessage()))
                     );
     }
 
@@ -53,7 +53,7 @@ public class ProductoRouter
                                     return ServerResponse.ok()
                                             .contentType(MediaType.APPLICATION_JSON)
                                             .body(BodyInserters.fromPublisher(useCase.apply(pagina, tamanoPagina), ProductoDTO.class))
-                                            .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()));
+                                            .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue(throwable.getMessage()));
                                 }
                     );
     }
@@ -69,7 +69,7 @@ public class ProductoRouter
                         .flatMap(result -> ServerResponse.ok()
                                                          .contentType(MediaType.APPLICATION_JSON)
                                                          .bodyValue(result))
-                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue(throwable.getMessage()))
         );
     }
 
@@ -86,7 +86,7 @@ public class ProductoRouter
                         .flatMap(result -> ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(result))
-                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue(throwable.getMessage()))
         );
     }
 
@@ -102,7 +102,7 @@ public class ProductoRouter
                         .flatMap(result -> ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(result))
-                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue(throwable.getMessage()))
         );
     }
 
@@ -117,7 +117,7 @@ public class ProductoRouter
                         .flatMap(result -> ServerResponse.ok()
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(result))
-                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.INTERNAL_SERVER_ERROR).bodyValue(throwable.getMessage()))
+                        .onErrorResume(throwable -> ServerResponse.status(HttpStatus.NOT_FOUND).bodyValue(throwable.getMessage()))
         );
     }
 

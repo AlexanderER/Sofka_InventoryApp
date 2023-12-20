@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.function.Function;
 
 @Service
@@ -45,7 +46,10 @@ public class CrearProductoUseCase implements Function<ProductoDTO, Mono<Producto
                                                                                                        .build();
                                                 eventBus.publishMovement(movimiento);
                                               })
-                .doOnError(error -> Mono.error(new RuntimeException("[Producto] Error al guardar el producto.", error)))
+                .doOnError(error -> {
+                                        eventBus.publishError("[CrearProductoUseCase] [" + LocalDateTime.now().toString() + "] Error al crear producto. Descripcion: " + productoDTO.getDescripcion());
+                                        Mono.error(new RuntimeException("[Producto] Error al guardar el producto.", error));
+                                    })
                 .map(this::getProductoDTO);
     }
 

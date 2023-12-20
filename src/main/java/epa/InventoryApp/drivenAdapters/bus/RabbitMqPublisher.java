@@ -34,4 +34,18 @@ public class RabbitMqPublisher
                      )
                 .subscribe();
     }
+
+    public void publishError(String object)
+    {
+        //String json = gson.toJson(object);
+
+        log.info("{}Registrando Error: " + object + "{}", "\u001B[32m", "\u001B[0m");
+
+        sender
+                .send(Mono.just(new OutboundMessage(RabbitConfig.EXCHANGE_NAME_ERRORS,
+                        RabbitConfig.ROUTING_KEY_NAME_ERRORS,
+                        object.getBytes()))
+                )
+                .subscribe();
+    }
 }

@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 
@@ -44,7 +45,8 @@ public class VentaAlPorMayorUseCase implements Function<List<VentaInventarioDTO>
                     }
                     else
                     {
-                        return Flux.error(new RuntimeException("[Producto] Error al menos un elemento no aplica para venta al por Mayor."));
+                        eventBus.publishError("[VentaAlPorMayorUseCase] [" + LocalDateTime.now().toString() + "] Al menos un elemento no aplica para venta al Por Mayor.");
+                        return Flux.error(new RuntimeException("[Producto] Error al menos un elemento no aplica para venta al Por Mayor."));
                     }
                 });
     }
@@ -85,10 +87,16 @@ public class VentaAlPorMayorUseCase implements Function<List<VentaInventarioDTO>
 
                                 eventBus.publishMovement(movimiento);
                             })
-                            .doOnError(error -> Mono.error(new RuntimeException("[Producto] Error al Procesar Venta al Por Mayor.", error)))
+                            .doOnError(error -> {
+                                                    eventBus.publishError("[VentaAlPorMayorUseCase] [" + LocalDateTime.now().toString() + "] Error al Procesar Venta al Por Mayor. Id Producto: " + idProducto + " Cant: " + cantidadVenta);
+                                                    Mono.error(new RuntimeException("[Producto] Error al registrar venta al Por Mayor.", error));
+                                                })
                             .map(this::getProductoDTO);
                 })
-                .switchIfEmpty(Mono.error(new RuntimeException("Producto no encontrado con ID: " + idProducto)));
+                .switchIfEmpty(Mono.defer(() -> {  // Para asegurarse de que eventBus.publishError("") se ejecute solo cuando switchIfEmpty se activa
+                                                    eventBus.publishError("[VentaAlPorMayorUseCase] [" + LocalDateTime.now().toString() + "] Producto no encontrado. Id: " + idProducto);
+                                                    return Mono.error(new RuntimeException("Producto no encontrado con ID: " + idProducto));
+                                                }));
     }
 
 
