@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sofka-webinventory
+  template:
+    metadata:
+      labels:
+        app: sofka-webinventory
+    spec:
+      containers:
+        - name: sofka-webinventory
+          image: alexer1515/inventoryapp #Defino la imagen
+          ports:
+            - containerPort: 8083
+          env:
+            - name: appPort
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config
+                  key: appPort
+            - name: mongoUri
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config
+                  key: mongoUri
+            - name: mongoDatabase
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config
+                  key: mongoDatabase
+            - name: rabbitUri
+              valueFrom:
+                configMapKeyRef:
+                  name: web-config
+                  key: rabbitUri
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: inventory-service
+spec:
+  type: NodePort
+  selector:
+    app: sofka-webinventory
+  ports:
+    - protocol: TCP
+      port: 8083
+      targetPort: 8083
+      nodePort: 30005
